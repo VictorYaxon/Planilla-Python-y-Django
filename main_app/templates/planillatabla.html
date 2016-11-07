@@ -34,8 +34,16 @@
           <TD>{{anios_Igss.cuota_igss}}</TD>
           <TD>{{mes_seleccionado}}</TD>
           <TD>{{anios_Salario.cuota_salario}}</TD>
-          <TD>{{i.bono}}</TD>
-          <TD>{{i.ret}}</TD>
+          {% if i.bono > 0 %}
+            <TD>{{i.bono}}</TD>
+            {% else %}
+            <TD>Unknown</TD>
+          {% endif %}
+          {% if i.ret > 0 %}
+            <TD>{{i.ret}}</TD>
+            {% else %}
+            <TD>Unknown</TD>
+          {% endif %}
           <TD>{{i.totalSueldo}}</TD>
           <TD>{{i.sueldoLiquido}}</TD>
          </TR>

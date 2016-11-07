@@ -17,20 +17,26 @@ def empleado_ingresar(request):
         fechaInicio_formulario = form_data.get("fechaInicio_form")
         estado_formulario = form_data.get("estado_form")
         fechaInactividad_formulario = form_data.get("fechaInactividad_form")
-        obj = Empleado.objects.create(nombre=nombre_formulario,apellido=apellido_formulario,fechaInicio=fechaInicio_formulario,estado=estado_formulario,fechaInactividad=fechaInactividad_formulario)
+        obj = Empleado.objects.create(nombre=nombre_formulario,
+        apellido=apellido_formulario,
+        fechaInicio=fechaInicio_formulario,
+        estado=estado_formulario,
+        fechaInactividad=fechaInactividad_formulario)
         if request.method=="POST":
             return HttpResponseRedirect('/empleado/')
     return render(request,"post_empleado.html",{'form':form})
 
 def bonificacion_ingresar(request):
     empleados = Empleado.objects.all()
-    form = BonificacionForm(request.POST or None)
+    form = BonificacionForm(request.POST or None, initial={'Bonificacion_form': 0.0})
     if form.is_valid():
         form_data = form.cleaned_data
         cuota_bonificacion_form = form_data.get("Bonificacion_form")
         fechabonificacion_bonificacion_form = form_data.get("fechaBonificacion_form")
         usuario_form = request.POST.get('nombres')
-        obj=Bonificacion.objects.create(idEmpleado_id=usuario_form,BonificacionCuota=cuota_bonificacion_form,fechaBonificacion=fechabonificacion_bonificacion_form)
+        obj=Bonificacion.objects.create(idEmpleado_id=usuario_form,
+        BonificacionCuota=cuota_bonificacion_form,
+        fechaBonificacion=fechabonificacion_bonificacion_form)
         if request.method=="POST":
             return HttpResponseRedirect('/bonificacion/')
     return render(request,"post_bonificacion.html",{'form':form,'empleados':empleados})
@@ -59,16 +65,19 @@ def salario_ingresar(request):
 
 def retencion_ingresar(request):
     empleados = Empleado.objects.all()
-    form = RetencionForm(request.POST or None)
+    form = RetencionForm(request.POST or None, initial={'Retencion_form': 0.0})
     if form.is_valid():
         form_data = form.cleaned_data
         cuota_retencion_form = form_data.get("Retencion_form")
         fechaRetencion_retencion_form = form_data.get("fechaRetencion_form")
         usuario_form = request.POST.get('nombres')
-        obj=Retencion.objects.create(idEmpleado_id=usuario_form,RetencionCuota=cuota_retencion_form,fechaRetencion=fechaRetencion_retencion_form)
+        obj=Retencion.objects.create(idEmpleado_id=usuario_form,
+        RetencionCuota=cuota_retencion_form,
+        fechaRetencion=fechaRetencion_retencion_form)
         if request.method=="POST":
             return HttpResponseRedirect('/retencion/')
-    return render(request,"post_retencion.html",{'form':form,'empleados':empleados})
+    return render(request,"post_retencion.html",{'form':form,
+                         'empleados':empleados})
 
 def editar_salario(request,id_salario):
     salario = SalarioOrdinario.objects.get(pk=id_salario)
@@ -87,7 +96,9 @@ def editar_salario(request,id_salario):
 def editar_retencion(request,id_retencion):
     empleados = Empleado.objects.all()
     retencion = Retencion.objects.get(pk=id_retencion)
-    form = RetencionForm(request.POST or None)
+    form = RetencionForm(request.POST or None,initial={
+    'Retencion_form':retencion.RetencionCuota,
+    'fechaRetencion_form':retencion.fechaRetencion})
     if form.is_valid():
         form_data = form.cleaned_data
         cuota_retencion_form = form_data.get("Retencion_form")
@@ -135,16 +146,18 @@ def editar_bonificacion(request,id_bonificacion):
 
 def editar_planilla(request,id_planilla):
     planilla = PlanillaGenerar.objects.get(pk=id_planilla)
-    form = PlanillaGenerarForm(request.POST or None, initial={'empleado_planilla': planilla.empleado_planilla,'apellido_planilla': planilla.apellido_planilla
-        ,'fecha_inicio_planilla': planilla.fecha_inicio_planilla
-        ,'igss_cuota': planilla.igss_cuota
-        ,'igss_anio_planilla': planilla.igss_anio_planilla
-        ,'mes_planilla': planilla.mes_planilla 
-        ,'cuota_salario_planilla': planilla.cuota_salario_planilla 
-        ,'bonificacion_planilla': planilla.bonificacion_planilla
-        ,'retencion_planilla': planilla.retencion_planilla
-        ,'sueldoTotal_planilla': planilla.sueldoTotal_planilla
-        ,'sueldoLiquido_planilla': planilla.sueldoLiquido_planilla })
+    form = PlanillaGenerarForm(request.POST or None,
+    initial={'empleado_planilla': planilla.empleado_planilla,
+        'apellido_planilla': planilla.apellido_planilla,
+        'fecha_inicio_planilla': planilla.fecha_inicio_planilla,
+        'igss_cuota': planilla.igss_cuota,
+        'igss_anio_planilla': planilla.igss_anio_planilla,
+        'mes_planilla': planilla.mes_planilla,
+        'cuota_salario_planilla': planilla.cuota_salario_planilla,
+        'bonificacion_planilla': planilla.bonificacion_planilla,
+        'retencion_planilla': planilla.retencion_planilla,
+        'sueldoTotal_planilla': planilla.sueldoTotal_planilla,
+        'sueldoLiquido_planilla': planilla.sueldoLiquido_planilla })
     if form.is_valid():
         form_data = form.cleaned_data
         planilla.empleado_planilla= form_data.get("empleado_planilla")
@@ -156,9 +169,12 @@ def editar_planilla(request,id_planilla):
         planilla.cuota_salario_planilla= form_data.get("cuota_salario_planilla")
         planilla.bonificacion_planilla= form_data.get("bonificacion_planilla")
         planilla.retencion_planilla= form_data.get("retencion_planilla")
-        sueldoT = float(form_data.get("retencion_planilla")) + float(form_data.get("cuota_salario_planilla")) + float(form_data.get("bonificacion_planilla"))
+        sueldoT = float(form_data.get("retencion_planilla"))
+        + float(form_data.get("cuota_salario_planilla"))
+        + float(form_data.get("bonificacion_planilla"))
         planilla.sueldoTotal_planilla= sueldoT
-        sueldoL = sueldoT - float(form_data.get("retencion_planilla")) - float(form_data.get("igss_cuota"))
+        sueldoL = sueldoT - float(form_data.get("retencion_planilla"))
+        - float(form_data.get("igss_cuota"))
         planilla.sueldoLiquido_planilla= sueldoL
         planilla.save()
     return render(request,"editar_planilla.html",{'form':form})
@@ -192,17 +208,20 @@ def igss_ver(request):
 def empleado_ver(request):
     empleado_lista = Empleado.objects.all()
     form = EmpleadoForm()
-    return render(request,'empleado.html',{'empleado_lista':empleado_lista,'form':form})
+    return render(request,'empleado.html',{'empleado_lista':empleado_lista,
+    'form':form})
 
 def salario_ver(request):
     salario_lista = SalarioOrdinario.objects.all()
     form = SalarioOrdinarioForm()
-    return render(request,'salario.html',{'salario_lista':salario_lista,'form':form})
+    return render(request,'salario.html',{'salario_lista':salario_lista,
+    'form':form})
 
 def bonificacion_ver(request):
     bonificacion_lista = Bonificacion.objects.all()
     form = BonificacionForm()
-    return render(request,'bonificacion.html',{'bonificacion_lista':bonificacion_lista,'form':form})
+    return render(request,'bonificacion.html',{'bonificacion_lista':bonificacion_lista,
+    'form':form})
 
 def iggs_detalle(request,id_igss):
     igss = Igss.objects.get(pk=id_igss)
@@ -212,7 +231,8 @@ def iggs_detalle(request,id_igss):
 def retencion_ver(request):
     retencion_lista = Retencion.objects.all()
     form = RetencionForm()
-    return render(request,'retencion.html',{'retencion_lista':retencion_lista,'form':form})
+    return render(request,'retencion.html',{'retencion_lista':retencion_lista,
+    'form':form})
 
 mes_planilla = 0
 anio_planilla = 0
@@ -228,64 +248,77 @@ def planilla_ver(request):
     anios = []
     for i in range(1999,int(time.strftime("%Y"))):
         i = i + 1
-        anios.append(i)    
+        anios.append(i)
     mes_seleccionado= request.POST.get('meses')
     anio_seleccionado= request.POST.get('nombres')
     mes_planilla = mes_seleccionado
     anio_planilla = anio_seleccionado
     datos_generar_planilla(anio_seleccionado,mes_seleccionado)
-    print anio_planilla
     if request.method=="POST":
         anios_Igss = Igss.objects.get(anio=anio_seleccionado)
         anios_Salario = SalarioOrdinario.objects.get(anio=anio_seleccionado)
         empleados_anio = Empleado.objects.filter(fechaInicio__year__lte=anio_seleccionado)
         for empleado in empleados_anio:
-            retencion_planilla = empleado.retencion_set.filter(fechaRetencion__year__lte=anio_seleccionado,fechaRetencion__month__lte=mes_seleccionado,idEmpleado=empleado.id)[:1]
-            bonificacion_planilla = empleado.bonificacion_set.filter(fechaBonificacion__year__lte=anio_seleccionado,fechaBonificacion__month__lte=mes_seleccionado,idEmpleado=empleado.id)[:1]
+            retencion_planilla = empleado.retencion_set.filter(
+            fechaRetencion__year__lte=anio_seleccionado,
+            fechaRetencion__month__lte=mes_seleccionado,
+            idEmpleado=empleado.id)[:1]
+            bonificacion_planilla = empleado.bonificacion_set.filter(
+            fechaBonificacion__year__lte=anio_seleccionado,
+            fechaBonificacion__month__lte=mes_seleccionado,
+            idEmpleado=empleado.id)[:1]
             for item in bonificacion_planilla:
                 empleado.bono = item.BonificacionCuota
+                if empleado.bono == "Unknown":
+                    empleado.bono = 0.0
+                    print (empleado.bono)
                 empleado.totalSueldo = float(anios_Salario.cuota_salario) + float(empleado.bono)
                 empleado.sueldoLiquido = empleado.totalSueldo - float(anios_Igss.cuota_igss)
             for items in retencion_planilla:
                 empleado.ret = items.RetencionCuota
+                if empleado.ret == "Unknown":
+                    empleado.ret = 0.0
                 empleado.totalSueldo += float(empleado.ret)
-                empleado.sueldoLiquido    
+                empleado.sueldoLiquido
+
         return render(request,'planillatabla.html',
                 {'mes_seleccionado':mes_seleccionado,
                 'anios_Igss':anios_Igss,'empleados_anio':empleados_anio,
                 'anios_Salario':anios_Salario,
                 'bonificacion_planilla':bonificacion_planilla,
-                'anio_seleccionado':anio_seleccionado,})  
-    return render(request,'planilla.html',{'anio_planilla':anio_planilla,'anios_lista':anios,'form':form,'mes_seleccionado':mes_seleccionado,'anio_seleccionado':anio_seleccionado})
-    
-print mes_planilla + 12
+                'anio_seleccionado':anio_seleccionado,})
+    return render(request,'planilla.html',{'anio_planilla':anio_planilla,
+    'anios_lista':anios,
+    'form':form,'mes_seleccionado':mes_seleccionado,'anio_seleccionado':anio_seleccionado})
+
 lista_nueva = []
 
 def planilla_buscar(request):
     anios = []
     for i in range(1999,int(time.strftime("%Y"))):
         i = i + 1
-        anios.append(i)    
+        anios.append(i)
     mes_seleccionado= request.POST.get('meses')
     anio_seleccionado= request.POST.get('nombres')
-    planillasGeneradas_lista = PlanillaGenerar.objects.filter(mes_planilla=mes_seleccionado,igss_anio_planilla=anio_seleccionado)
-    if request.method=="POST":   
+    planillasGeneradas_lista = PlanillaGenerar.objects.filter(
+    mes_planilla=mes_seleccionado,
+    igss_anio_planilla=anio_seleccionado)
+    if request.method=="POST":
         form = PlanillaGenerarForm()
         return render(request,'planilla_tabla_buscar.html',
                 {'mes_seleccionado':mes_seleccionado,
                 'planillasGeneradas_lista':planillasGeneradas_lista,
-                'anio_seleccionado':anio_seleccionado,})  
-    return render(request,'planillabuscar.html',{'anio_planilla':anio_planilla,'anios_lista':anios,'mes_seleccionado':mes_seleccionado,'anio_seleccionado':anio_seleccionado})
-
-
+                'anio_seleccionado':anio_seleccionado,})
+    return render(request,
+                         'planillabuscar.html',{'anio_planilla':anio_planilla,
+                         'anios_lista':anios,
+                         'mes_seleccionado':mes_seleccionado,
+                         'anio_seleccionado':anio_seleccionado})
 
 def planilla_datos(x,igss,salario,mes,anio):
-    list(set(planilla_ingreso))
-    list(set(x))
     form = PlanillaForm()
-    print x
     for planilla in x:
-        nombre = planilla.nombre 
+        nombre = planilla.nombre
         apellido = planilla.apellido
         fecha_ini = planilla.fechaInicio
         anio_igss = anio
@@ -297,7 +330,6 @@ def planilla_datos(x,igss,salario,mes,anio):
         totalSueldo = planilla.totalSueldo
         sueldoLiquido = planilla.sueldoLiquido
         lista_nueva.append(planilla)
-        print lista_nueva
         obj = PlanillaGenerar.objects.get_or_create(empleado_planilla=nombre,
             apellido_planilla=apellido,
             fecha_inicio_planilla=fecha_ini,
@@ -313,18 +345,21 @@ def planilla_datos(x,igss,salario,mes,anio):
         HttpResponseRedirect('/index/')
 
 def planilla_ingreso_datos(request,anio,mes):
-    list(set(planilla_ingreso))
     anio_planilla = anio
     mes_planilla = mes
-    print anio_planilla,mes_planilla
     if request.method=="POST":
-        print anio_planilla
         anios_Igss = Igss.objects.get(anio=anio_planilla)
         anios_Salario = SalarioOrdinario.objects.get(anio=anio_planilla)
         empleados_anio = Empleado.objects.filter(fechaInicio__year__lte=anio_planilla)
         for empleado in empleados_anio:
-            retencion_planilla = empleado.retencion_set.filter(fechaRetencion__year__lte=anio_planilla,fechaRetencion__month__lte=mes_planilla,idEmpleado=empleado.id)[:1]
-            bonificacion_planilla = empleado.bonificacion_set.filter(fechaBonificacion__year__lte=anio_planilla,fechaBonificacion__month__lte=mes_planilla,idEmpleado=empleado.id)[:1]
+            retencion_planilla = empleado.retencion_set.filter(
+                                    fechaRetencion__year__lte=anio_planilla,
+                                    fechaRetencion__month__lte=mes_planilla,
+                                    idEmpleado=empleado.id)[:1]
+            bonificacion_planilla = empleado.bonificacion_set.filter(
+                                    fechaBonificacion__year__lte=anio_planilla,
+                                    fechaBonificacion__month__lte=mes_planilla,
+                                    idEmpleado=empleado.id)[:1]
             for item in bonificacion_planilla:
                 empleado.bono = item.BonificacionCuota
                 empleado.totalSueldo = float(anios_Salario.cuota_salario) + float(empleado.bono)
@@ -332,32 +367,38 @@ def planilla_ingreso_datos(request,anio,mes):
             for items in retencion_planilla:
                 empleado.ret = items.RetencionCuota
                 empleado.totalSueldo += float(empleado.ret)
-                empleado.sueldoLiquido  
-                planilla_ingreso.append(empleado)     
-                list(set(planilla_ingreso))
-                print planilla_ingreso,anios_Igss.cuota_igss,anios_Salario.cuota_salario,mes_planilla,anio_planilla
-                planilla_datos(planilla_ingreso,anios_Igss.cuota_igss,anios_Salario.cuota_salario,mes_planilla,anio_planilla)
-                print planilla_ingreso
-                list(set(planilla_ingreso))
-    return render(request,'post_planilla.html')  
-
-
+                empleado.sueldoLiquido
+                planilla_ingreso.append(empleado)
+                planilla_datos(planilla_ingreso,anios_Igss.cuota_igss
+                                               ,anios_Salario.cuota_salario
+                                               ,mes_planilla
+                                               ,anio_planilla)
+        if request.method=="POST":
+            print ('hola')
+        return HttpResponseRedirect('/planilla/')
+    return render(request,'post_planilla.html')
 
 def planilla_ingresar(request):
-    list(set(planilla_ingreso))
     mes_seleccionado= request.POST.get('meses')
     anio_seleccionado= request.POST.get('nombres')
     if request.method=="POST":
         anios_Igss = Igss.objects.get(anio=anio_seleccionado)
         anios_Salario = SalarioOrdinario.objects.get(anio=anio_seleccionado)
-        empleados_anio = Empleado.objects.filter(fechaInicio__year__lte=anio_seleccionado)
+        empleados_anio = Empleado.objects.filter(
+                        fechaInicio__year__lte=anio_seleccionado)
         for empleado in empleados_anio:
-            retencion_planilla = empleado.retencion_set.filter(fechaRetencion__year__lte=anio_seleccionado,fechaRetencion__month__lte=mes_seleccionado,idEmpleado=empleado.id)[:1]
-            bonificacion_planilla = empleado.bonificacion_set.filter(fechaBonificacion__year__lte=anio_seleccionado,fechaBonificacion__month__lte=mes_seleccionado,idEmpleado=empleado.id)[:1]
+            retencion_planilla = empleado.retencion_set.filter(
+                                fechaRetencion__year__lte=anio_seleccionado,
+                                fechaRetencion__month__lte=mes_seleccionado,
+                                idEmpleado=empleado.id)[:1]
+            bonificacion_planilla = empleado.bonificacion_set.filter(
+                                    fechaBonificacion__year__lte=anio_seleccionado,
+                                    fechaBonificacion__month__lte=mes_seleccionado,
+                                    idEmpleado=empleado.id)[:1]
             for item in bonificacion_planilla:
                 empleado.bono = item.BonificacionCuota
-                empleado.totalSueldo = float(anios_Salario.cuota_salario) + float(empleado.bono)
-                empleado.sueldoLiquido = empleado.totalSueldo - float(anios_Igss.cuota_igss)
+                empleado.totalSueldo = float(anios_Salario.cuota_salario)+ float(empleado.bono)
+                empleado.sueldoLiquido = empleado.totalSueldo- float(anios_Igss.cuota_igss)
             for items in retencion_planilla:
                 empleado.ret = items.RetencionCuota
                 empleado.totalSueldo += float(empleado.ret)
@@ -368,7 +409,7 @@ def planilla_ingresar(request):
                 'anios_Igss':anios_Igss,'empleados_anio':empleados_anio,
                 'anios_Salario':anios_Salario,
                 'bonificacion_planilla':bonificacion_planilla,
-                'anio_seleccionado':anio_seleccionado,'lista':lista}) 
+                'anio_seleccionado':anio_seleccionado,'lista':lista})
 
 def eliminar_empleado(request,id_empleado):
     empleado = Empleado.objects.get(pk=id_empleado)
