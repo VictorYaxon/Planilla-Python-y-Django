@@ -1,0 +1,30 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <head>
+      <title>IGSS</title>
+  </head>
+  <body>
+  <h1>IGSS</h1>
+  <TABLE BORDER="1">
+    <TR>
+   <TH>Año</TH>
+   <TH>Cuota IGSS</TH>
+    </TR>
+    {% for i in igss_lista %}
+    <TR>
+     <TD>{{ i.anio }}</TD>
+     <TD>{{ i.cuota_igss }}</TD>
+      <TD><a href="/eliminar_igss/{{i.id}}/">Eliminar</TD>
+      <TD><a href="/editar_igss/{{i.id}}/">Editar</TD>
+     </TR>
+  {% endfor %}
+
+  </TABLE>
+    <a href="/{{i.id}}/">
+    </a>
+    <a href="/post_igss">Agregar</a>
+    <a href="/index">Inicio</a>
+  </body>
+</html>

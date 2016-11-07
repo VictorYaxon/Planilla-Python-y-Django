@@ -1,0 +1,48 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>PlanillaGenerate</title>
+  </head>
+  <body>
+  <h1>Planilla Generar</h1>
+    <form action="" method="post" >
+      {% csrf_token %}
+      <p>Año Seleccionado</p><p>{{anios_Salario.anio}}</p>
+      <TABLE BORDER="1" class="planilla">
+        <TR>
+       <TH>ID</TH>
+       <TH>Empleado</TH>
+       <TH>Apellido</TH>
+       <TH>Fecha Inicio</TH>
+       <TH>IGSS</TH>
+       <TH>Cuota IGSS</TH>
+       <TH>Mes</TH>
+       <TH>Cuota Salario Ordinario</TH>
+       <TH>Bonificacion</TH>
+       <TH>Retencion</TH>
+       <TH>Sueldo Total</TH>
+       <TH>Sueldo Liquido</TH>
+        </TR>
+        {% for i in empleados_anio  %}
+        <TR>
+          <TD>{{i.id}}</TD>
+          <TD>{{i.nombre }}</TD>
+          <TD>{{i.apellido }}</TD>
+          <TD>{{i.fechaInicio }}</TD>
+          <TD>{{anios_Igss.anio}}</TD>
+          <TD>{{anios_Igss.cuota_igss}}</TD>
+          <TD>{{mes_seleccionado}}</TD>
+          <TD>{{anios_Salario.cuota_salario}}</TD>
+          <TD>{{i.bono}}</TD>
+          <TD>{{i.ret}}</TD>
+          <TD>{{i.totalSueldo}}</TD>
+          <TD>{{i.sueldoLiquido}}</TD>
+         </TR>
+         {% endfor %}
+      </TABLE>
+    </form>
+    <TD><a href="/post_planilla/{{anios_Salario.anio}}/{{mes_seleccionado}}/">Guardar</TD>
+    <TD><a href="/planilla_busqueda/">Buscar Planillas Generadas</TD>
+  </body>
+</html>

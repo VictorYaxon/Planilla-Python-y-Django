@@ -1,0 +1,36 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>Empleado</title>
+  </head>
+  <body>
+  <h1>Empleado</h1>
+  <TABLE BORDER="1">
+    <TR>
+   <TH>Nombre</TH>
+   <TH>Apellido</TH>
+   <TH>Fecha Inicio</TH>
+   <TH>Estado</TH>
+   <TH>Fecha Inactividad</TH>
+    </TR>
+    {% for i in empleado_lista %}
+    <TR>
+     <TD>{{ i.id }}</TD>
+     <TD>{{ i.nombre }}</TD>
+     <TD>{{ i.apellido }}</TD>
+     <TD>{{ i.fechaInicio }}</TD>
+     <TD>{{ i.estado }}</TD>
+     <TD>{{ i.fechaInactividad }}</TD>
+      <TD><a href="/eliminar_empleado/{{i.id}}/">Eliminar</TD>
+      <TD><a href="/editar_empleado/{{i.id}}/">Editar</TD>
+     </TR>
+  {% endfor %}
+
+  </TABLE>
+    <a href="/{{i.id}}/">
+    </a>
+    <a href="/index">Inicio</a>
+    <a href="/post_empleado">Agregar</a>
+  </body>
+</html>

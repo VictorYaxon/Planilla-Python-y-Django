@@ -1,0 +1,48 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <head>
+      <title>Planillas Generadas</title>
+  </head>
+  <body>
+  <h1>Planillas Generadas</h1>
+  <TABLE BORDER="1">
+    <TR>
+   <TH>ID</TH>
+   <TH>Empleado</TH>
+   <TH>Apellido</TH>
+   <TH>Fecha Inicio</TH>
+   <TH>IGSS</TH>
+   <TH>Cuota IGSS</TH>
+   <TH>Mes</TH>
+   <TH>Cuota Salario Ordinario</TH>
+   <TH>Bonificacion</TH>
+   <TH>Retencion</TH>
+   <TH>Sueldo Total</TH>
+   <TH>Sueldo Liquido</TH>
+   <TH>Eliminar</TH>
+   <TH>Editar</TH>
+    </TR>
+    {% for i in planillasGeneradas_lista %}
+    <TR>
+     <TD>{{ i.id }}</TD>
+     <TD>{{ i.empleado_planilla }}</TD>
+     <TD>{{ i.apellido_planilla }}</TD>
+     <TD>{{ i.fecha_inicio_planilla }}</TD>
+     <TD>{{ i.igss_anio_planilla }}</TD>
+     <TD>{{ i.igss_cuota}}</TD>
+     <TD>{{ i.mes_planilla }}</TD>
+     <TD>{{ i.cuota_salario_planilla }}</TD>
+     <TD>{{ i.bonificacion_planilla }}</TD>
+     <TD>{{ i.retencion_planilla }}</TD>
+     <TD>{{ i.sueldoTotal_planilla }}</TD>
+     <TD>{{ i.sueldoLiquido_planilla }}</TD>
+     <TD><a href="/eliminar_planilla/{{i.id}}/">Eliminar</TD>
+     <TD><a href="/editar_planilla/{{i.id}}/">Editar</TD>
+     </TR>
+  {% endfor %}
+
+  </TABLE>
+  </body>
+</html>

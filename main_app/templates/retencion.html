@@ -1,0 +1,32 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <head>
+      <title>Retencion</title>
+  </head>
+  <body>
+  <h1>Retencion</h1>
+  <TABLE BORDER="1">
+    <TR>
+   <TH>Retencion</TH>
+   <TH>Fecha Retencion</TH>
+   <TH>Usuario</TH>
+    </TR>
+    {% for i in retencion_lista %}
+    <TR>
+     <TD>{{ i.RetencionCuota }}</TD>
+     <TD>{{ i.fechaRetencion }}</TD>
+     <TD>{{ i.idEmpleado_id }}</TD>
+      <TD><a href="/eliminar_retencion/{{i.id}}/">Eliminar</TD>
+      <TD><a href="/editar_retencion/{{i.id}}/">Editar</TD>
+     </TR>
+  {% endfor %}
+
+  </TABLE>
+    <a href="/{{i.id}}/">
+    </a>
+    <a href="/post_retencion">Agregar</a>
+    <a href="/index">Inicio</a>
+  </body>
+</html>

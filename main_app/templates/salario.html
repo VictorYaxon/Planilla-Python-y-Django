@@ -1,0 +1,29 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>Salario Ordinario</title>
+  </head>
+  <body>
+  <h1>Salario Ordinario</h1>
+  <TABLE BORDER="1">
+    <TR>
+   <TH>Año</TH>
+   <TH>Cuota Salario Ordinario</TH>
+    </TR>
+    {% for i in salario_lista %}
+    <TR>
+     <TD>{{ i.anio }}</TD>
+     <TD>{{ i.cuota_salario }}</TD>
+      <TD><a href="/eliminar_salario/{{i.id}}/">Eliminar</TD>
+      <TD><a href="/editar_salario/{{i.id}}/">Editar</TD>
+     </TR>
+  {% endfor %}
+
+  </TABLE>
+    <a href="/{{i.id}}/">
+    </a>
+    <a href="/index">Inicio</a>
+    <a href="/post_salario">Agregar</a>
+  </body>
+</html>

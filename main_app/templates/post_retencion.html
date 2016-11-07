@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>Retencion</title>
+  </head>
+  <body>
+  <h1>Retencion</h1>
+    <form action="" method="post" >
+      {% csrf_token %}
+      {{form.as_p}}
+      <select name="nombres">
+      {% for i in empleados %}
+        <option value="{{i.id}}">{{i.nombre}}</option>
+      {% endfor %}
+      </select>
+      <input type="submit" value="Enviar" />
+    </form>
+  </body>
+</html>

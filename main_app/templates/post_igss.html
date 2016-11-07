@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>IGSS</title>
+  </head>
+  <body>
+  <h1>IGSS</h1>
+    <form action="" method="post" >
+      {% csrf_token %}
+      {{form.as_p}}
+      <input type="submit" value="Enviar" />
+    </form>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+			<title></title>
+	</head>
+	<body>
+	<h1>Hola {{ igss.id }}</h1>
+	<form action="/igss/" method="post">
+	{% csrf_token %}
+    	 <input type="submit" value="Submit" />
+	</form>
+
+	</body>
+			
+</html>
