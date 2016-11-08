@@ -8,6 +8,10 @@
     <form action="" method="post" >
       {% csrf_token %}
       {{form.as_p}}
+      <select class="estado" name="estado">
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
       <input type="submit" value="Enviar" />
     </form>
   </body>

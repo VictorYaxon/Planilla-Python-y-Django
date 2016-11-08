@@ -34,16 +34,8 @@
           <TD>{{anios_Igss.cuota_igss}}</TD>
           <TD>{{mes_seleccionado}}</TD>
           <TD>{{anios_Salario.cuota_salario}}</TD>
-          {% if i.bono > 0 %}
-            <TD>{{i.bono}}</TD>
-            {% else %}
-            <TD>Unknown</TD>
-          {% endif %}
-          {% if i.ret > 0 %}
-            <TD>{{i.ret}}</TD>
-            {% else %}
-            <TD>Unknown</TD>
-          {% endif %}
+          <TD>{{i.bono}}</TD>
+          <TD>{{i.ret}}</TD>
           <TD>{{i.totalSueldo}}</TD>
           <TD>{{i.sueldoLiquido}}</TD>
          </TR>
@@ -52,5 +44,7 @@
     </form>
     <TD><a href="/post_planilla/{{anios_Salario.anio}}/{{mes_seleccionado}}/">Guardar</TD>
     <TD><a href="/planilla_busqueda/">Buscar Planillas Generadas</TD>
+    <TD><a href="/index"</a>Inicio</TD>
+
   </body>
 </html>

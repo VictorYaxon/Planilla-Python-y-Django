@@ -1,13 +1,17 @@
+import time
+import datetime, calendar
 from django.shortcuts import render,redirect
 from django.http import HttpResponse,HttpResponseRedirect
+from django.utils.dateparse import parse_date
 from .models import Igss,SalarioOrdinario,Empleado,Bonificacion,Retencion,Planilla,PlanillaGenerar
 from .forms import IgssForm,SalarioOrdinarioForm,EmpleadoForm,BonificacionForm,RetencionForm,PlanillaForm,PlanillaGenerarForm
-import time
-import pdb
 
+mes_planilla = 0
+anio_planilla = 0
+planilla_ingreso = []
+lista_nueva = []
 
-id_encontrado = 0
-
+#Funcion para Agregar Empleados
 def empleado_ingresar(request):
     form = EmpleadoForm(request.POST or None)
     if form.is_valid():
@@ -15,9 +19,9 @@ def empleado_ingresar(request):
         nombre_formulario = form_data.get("nombre_form")
         apellido_formulario = form_data.get("apellido_form")
         fechaInicio_formulario = form_data.get("fechaInicio_form")
-        estado_formulario = form_data.get("estado_form")
+        estado_formulario = request.POST.get('estado')
         fechaInactividad_formulario = form_data.get("fechaInactividad_form")
-        obj = Empleado.objects.create(nombre=nombre_formulario,
+        obj = Empleado.objects.get_or_create(nombre=nombre_formulario,
         apellido=apellido_formulario,
         fechaInicio=fechaInicio_formulario,
         estado=estado_formulario,
@@ -26,6 +30,7 @@ def empleado_ingresar(request):
             return HttpResponseRedirect('/empleado/')
     return render(request,"post_empleado.html",{'form':form})
 
+#Funcion para Agregar Bonificacion
 def bonificacion_ingresar(request):
     empleados = Empleado.objects.all()
     form = BonificacionForm(request.POST or None, initial={'Bonificacion_form': 0.0})
@@ -34,35 +39,52 @@ def bonificacion_ingresar(request):
         cuota_bonificacion_form = form_data.get("Bonificacion_form")
         fechabonificacion_bonificacion_form = form_data.get("fechaBonificacion_form")
         usuario_form = request.POST.get('nombres')
-        obj=Bonificacion.objects.create(idEmpleado_id=usuario_form,
-        BonificacionCuota=cuota_bonificacion_form,
-        fechaBonificacion=fechabonificacion_bonificacion_form)
+        fecha = fechabonificacion_bonificacion_form
+        bonificacion_crear = Bonificacion.objects.filter(fechaBonificacion__month=fecha.month,fechaBonificacion__year=fecha.year,idEmpleado_id=usuario_form)
+        bonificacion_crear.exists()
+        if bonificacion_crear.exists() == True:
+            print ("ya existe un registro")
+        else:
+            obj=Bonificacion.objects.get_or_create(idEmpleado_id=usuario_form,
+            BonificacionCuota=cuota_bonificacion_form,
+            fechaBonificacion=fechabonificacion_bonificacion_form)
         if request.method=="POST":
             return HttpResponseRedirect('/bonificacion/')
     return render(request,"post_bonificacion.html",{'form':form,'empleados':empleados})
 
+#Funcion para Ingresar IGSS
 def igss_ingresar(request):
     form = IgssForm(request.POST or None)
     if form.is_valid():
         form_data = form.cleaned_data
         abc = form_data.get("anio__form")
         cuota = form_data.get("cuota_form")
-        obj = Igss.objects.create(anio=abc,cuota_igss=cuota)
+        fecha = Igss.objects.filter(anio=abc)
+        if fecha.exists()==True:
+            print ("ya existe un registro")
+        else:
+            obj = Igss.objects.get_or_create(anio=abc,cuota_igss=cuota)
         if request.method=="POST":
             return HttpResponseRedirect('/igss/')
     return render(request,"post_igss.html",{'form':form})
 
+#Funcion para Ingresar Salario
 def salario_ingresar(request):
     form = SalarioOrdinarioForm(request.POST or None)
     if form.is_valid():
         form_data = form.cleaned_data
         abc = form_data.get("anio__form")
         cuota = form_data.get("cuota_form")
-        obj = SalarioOrdinario.objects.create(anio=abc,cuota_salario=cuota)
+        fecha = SalarioOrdinario.objects.filter(anio=abc)
+        if fecha.exists()==True:
+            print ("ya existe un registro")
+        else:
+            obj = SalarioOrdinario.objects.get_or_create(anio=abc,cuota_salario=cuota)
         if request.method=="POST":
             return HttpResponseRedirect('/salario/')
     return render(request,"post_salario.html",{'form':form})
 
+#Funcion para Ingresar Retenciones
 def retencion_ingresar(request):
     empleados = Empleado.objects.all()
     form = RetencionForm(request.POST or None, initial={'Retencion_form': 0.0})
@@ -71,14 +93,22 @@ def retencion_ingresar(request):
         cuota_retencion_form = form_data.get("Retencion_form")
         fechaRetencion_retencion_form = form_data.get("fechaRetencion_form")
         usuario_form = request.POST.get('nombres')
-        obj=Retencion.objects.create(idEmpleado_id=usuario_form,
-        RetencionCuota=cuota_retencion_form,
-        fechaRetencion=fechaRetencion_retencion_form)
+        fecha = fechaRetencion_retencion_form
+        retencion_crear = Retencion.objects.filter(fechaRetencion__month=fecha.month,
+        fechaRetencion__year=fecha.year,idEmpleado_id=usuario_form)
+        retencion_crear.exists()
+        if retencion_crear.exists() == True:
+            print ("ya existe un registro")
+        else:
+            obj=Retencion.objects.get_or_create(idEmpleado_id=usuario_form,
+            RetencionCuota=cuota_retencion_form,
+            fechaRetencion=fechaRetencion_retencion_form)
         if request.method=="POST":
             return HttpResponseRedirect('/retencion/')
     return render(request,"post_retencion.html",{'form':form,
                          'empleados':empleados})
 
+#Funcion para Editar Salario obteniendo id
 def editar_salario(request,id_salario):
     salario = SalarioOrdinario.objects.get(pk=id_salario)
     form = SalarioOrdinarioForm(request.POST or None)
@@ -93,6 +123,7 @@ def editar_salario(request,id_salario):
             return HttpResponseRedirect('/salario/')
     return render(request,'editar_salario.html',{'form':form})
 
+#Funcion para Editar Retencion obteniendo id
 def editar_retencion(request,id_retencion):
     empleados = Empleado.objects.all()
     retencion = Retencion.objects.get(pk=id_retencion)
@@ -112,6 +143,7 @@ def editar_retencion(request,id_retencion):
             return HttpResponseRedirect('/retencion/')
     return render(request,"post_retencion.html",{'form':form,'empleados':empleados})
 
+#Funcion para Editar IGSS obteniendo id
 def editar_igss(request,id_igss):
     igss = Igss.objects.get(pk=id_igss)
     form = IgssForm(request.POST or None)
@@ -126,10 +158,12 @@ def editar_igss(request,id_igss):
             return HttpResponseRedirect('/igss/')
     return render(request,"editar_igss.html",{'form':form})
 
+#Funcion para Editar Bonificacion obteniendo id
 def editar_bonificacion(request,id_bonificacion):
     empleados = Empleado.objects.all()
     bonificacion = Bonificacion.objects.get(pk=id_bonificacion)
-    form = BonificacionForm(request.POST or None)
+    form = BonificacionForm(request.POST or None,initial={'Bonificacion_form':bonificacion.BonificacionCuota,
+    'fechaBonificacion_form':bonificacion.fechaBonificacion,'idEmpleado_id':bonificacion.idEmpleado_id})
     if form.is_valid():
         form_data = form.cleaned_data
         cuota_bonificacion_form = form_data.get("Bonificacion_form")
@@ -143,7 +177,7 @@ def editar_bonificacion(request,id_bonificacion):
             return HttpResponseRedirect('/bonificacion/')
     return render(request,"post_bonificacion.html",{'form':form,'empleados':empleados})
 
-
+#Funcion para Editar Planilla obteniendo id
 def editar_planilla(request,id_planilla):
     planilla = PlanillaGenerar.objects.get(pk=id_planilla)
     form = PlanillaGenerarForm(request.POST or None,
@@ -179,16 +213,18 @@ def editar_planilla(request,id_planilla):
         planilla.save()
     return render(request,"editar_planilla.html",{'form':form})
 
-
+#Funcion para Editar Empleado obteniendo id
 def editar_empleado(request,id_empleado):
     empleado = Empleado.objects.get(pk=id_empleado)
-    form = EmpleadoForm(request.POST or None)
+    form = EmpleadoForm(request.POST or None,initial={'nombre_form':empleado.nombre,
+    'apellido_form':empleado.apellido,'fechaInicio_form':empleado.fechaInicio,
+    'fechaInactividad_form':empleado.fechaInactividad})
     if form.is_valid():
         form_data = form.cleaned_data
         nombre_empleado_form = form_data.get("nombre_form")
         apellido_empleado_form = form_data.get("apellido_form")
         fechaInicio_empleado_form = form_data.get("fechaInicio_form")
-        estado_empleado_form= form_data.get("estado_form")
+        estado_empleado_form = request.POST.get('estado')
         fechaInactividad_empleado_form = form_data.get("fechaInactividad_form")
         empleado.nombre = nombre_empleado_form
         empleado.apellido = apellido_empleado_form
@@ -200,49 +236,47 @@ def editar_empleado(request,id_empleado):
             return HttpResponseRedirect('/empleado/')
     return render(request,"editar_empleado.html",{'form':form})
 
+#Funcion para Obtener lista de Igss de la base de datos
 def igss_ver(request):
     igss_lista = Igss.objects.all()
     form = IgssForm()
     return render(request,'igss.html',{'igss_lista':igss_lista,'form':form})
 
+#Funcion para Obtener lista de Empleados de la base de datos
 def empleado_ver(request):
     empleado_lista = Empleado.objects.all()
     form = EmpleadoForm()
     return render(request,'empleado.html',{'empleado_lista':empleado_lista,
     'form':form})
 
+#Funcion para Obtener lista de Salarios de la base de datos
 def salario_ver(request):
     salario_lista = SalarioOrdinario.objects.all()
     form = SalarioOrdinarioForm()
     return render(request,'salario.html',{'salario_lista':salario_lista,
     'form':form})
 
+#Funcion para Obtener lista de Bonificaciones de la base de datos
 def bonificacion_ver(request):
     bonificacion_lista = Bonificacion.objects.all()
     form = BonificacionForm()
     return render(request,'bonificacion.html',{'bonificacion_lista':bonificacion_lista,
     'form':form})
 
+#Funcion para Eliminar IGSS de la base de datos obteniendo el ID
 def iggs_detalle(request,id_igss):
     igss = Igss.objects.get(pk=id_igss)
     igss.delete()
     return HttpResponseRedirect('/igss/')
 
+#Funcion Para obtener lista de retenciones de la base de datos
 def retencion_ver(request):
     retencion_lista = Retencion.objects.all()
     form = RetencionForm()
     return render(request,'retencion.html',{'retencion_lista':retencion_lista,
     'form':form})
 
-mes_planilla = 0
-anio_planilla = 0
-planilla_ingreso = []
-
-def datos_generar_planilla(anio,mes):
-    mes_planilla= mes
-    anio_planilla = anio
-
-
+#Funcion Para obtener lista de Empleados,IGSS y salario ordinario de la DB
 def planilla_ver(request):
     form = PlanillaForm()
     anios = []
@@ -253,11 +287,10 @@ def planilla_ver(request):
     anio_seleccionado= request.POST.get('nombres')
     mes_planilla = mes_seleccionado
     anio_planilla = anio_seleccionado
-    datos_generar_planilla(anio_seleccionado,mes_seleccionado)
     if request.method=="POST":
         anios_Igss = Igss.objects.get(anio=anio_seleccionado)
         anios_Salario = SalarioOrdinario.objects.get(anio=anio_seleccionado)
-        empleados_anio = Empleado.objects.filter(fechaInicio__year__lte=anio_seleccionado)
+        empleados_anio = Empleado.objects.filter(fechaInicio__year__lte=anio_seleccionado,estado="Activo")
         for empleado in empleados_anio:
             retencion_planilla = empleado.retencion_set.filter(
             fechaRetencion__year__lte=anio_seleccionado,
@@ -291,8 +324,7 @@ def planilla_ver(request):
     'anios_lista':anios,
     'form':form,'mes_seleccionado':mes_seleccionado,'anio_seleccionado':anio_seleccionado})
 
-lista_nueva = []
-
+#Filtrar planillas Generadas por Anio y mes
 def planilla_buscar(request):
     anios = []
     for i in range(1999,int(time.strftime("%Y"))):
@@ -315,6 +347,7 @@ def planilla_buscar(request):
                          'mes_seleccionado':mes_seleccionado,
                          'anio_seleccionado':anio_seleccionado})
 
+#Funcion para obtener la lista y agregarlas a la base de datos
 def planilla_datos(x,igss,salario,mes,anio):
     form = PlanillaForm()
     for planilla in x:
@@ -344,13 +377,14 @@ def planilla_datos(x,igss,salario,mes,anio):
             )
         HttpResponseRedirect('/index/')
 
+#Funcion que recibe anio y mes, similar a ver planilla pero invoca funcion datos_generar_planilla
 def planilla_ingreso_datos(request,anio,mes):
     anio_planilla = anio
     mes_planilla = mes
     if request.method=="POST":
         anios_Igss = Igss.objects.get(anio=anio_planilla)
         anios_Salario = SalarioOrdinario.objects.get(anio=anio_planilla)
-        empleados_anio = Empleado.objects.filter(fechaInicio__year__lte=anio_planilla)
+        empleados_anio = Empleado.objects.filter(fechaInicio__year__lte=anio_planilla,estado="Activo")
         for empleado in empleados_anio:
             retencion_planilla = empleado.retencion_set.filter(
                                     fechaRetencion__year__lte=anio_planilla,
@@ -411,33 +445,40 @@ def planilla_ingresar(request):
                 'bonificacion_planilla':bonificacion_planilla,
                 'anio_seleccionado':anio_seleccionado,'lista':lista})
 
+#Funcion eliminar empleado de la base de datos
 def eliminar_empleado(request,id_empleado):
     empleado = Empleado.objects.get(pk=id_empleado)
     empleado.delete()
     return HttpResponseRedirect('/empleado/')
 
+#Funcion bonificacion de la base de datos
 def eliminar_bonificacion(request,id_bonificacion):
     bonificacion = Bonificacion.objects.get(pk=id_bonificacion)
     bonificacion.delete()
     return HttpResponseRedirect('/bonificacion/')
 
+#Funcion eliminar retencion de la base de datos
 def eliminar_retencion(request,id_retencion):
     retencion = Retencion.objects.get(pk=id_retencion)
     retencion.delete()
     return HttpResponseRedirect('/retencion/')
 
+#Funcion eliminar salario de la base de datos
 def salario_eliminar(request,id_salario):
     salario = SalarioOrdinario.objects.get(pk=id_salario)
     salario.delete()
     return HttpResponseRedirect('/salario/')
 
+#Funcion eliminar planilla de la base de datos
 def planilla_eliminar(request,id_planilla):
     planilla = PlanillaGenerar.objects.get(pk=id_planilla)
     planilla.delete()
     return HttpResponseRedirect('/planilla_busqueda/')
 
+#Funcion menu para la pagina inicial
 def index(request):
     return render(request,"index.html")
 
+#Funcion para listar IGSS
 def igss_principal(request):
     return render(request,"igss.html")

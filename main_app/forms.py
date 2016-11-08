@@ -13,7 +13,6 @@ class EmpleadoForm(forms.Form):
     nombre_form = forms.CharField(label ="Nombre",max_length=100)
     apellido_form = forms.CharField(label ="Apellido",max_length=100)
     fechaInicio_form = forms.DateField(label ="Fecha Inicio")
-    estado_form = forms.CharField(label ="Estado",max_length=100)
     fechaInactividad_form = forms.DateField(label="Fecha Inactividad",required=False)
 
 class BonificacionForm(forms.Form):
