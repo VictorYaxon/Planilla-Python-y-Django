@@ -13,6 +13,12 @@ lista_nueva = []
 
 #Funcion para Agregar Empleados
 def empleado_ingresar(request):
+    """
+    Funcion que permite insertar un nuevo empleado en la base de datos
+    en caso de que haya un usuario con los mismos datos no se le permitira ingresarlo
+    nuevamente.
+    """
+
     form = EmpleadoForm(request.POST or None)
     if form.is_valid():
         form_data = form.cleaned_data
@@ -21,17 +27,24 @@ def empleado_ingresar(request):
         fechaInicio_formulario = form_data.get("fechaInicio_form")
         estado_formulario = request.POST.get('estado')
         fechaInactividad_formulario = form_data.get("fechaInactividad_form")
-        obj = Empleado.objects.get_or_create(nombre=nombre_formulario,
-        apellido=apellido_formulario,
-        fechaInicio=fechaInicio_formulario,
-        estado=estado_formulario,
-        fechaInactividad=fechaInactividad_formulario)
+        obj = Empleado.objects.get_or_create(nombre=nombre_formulario,apellido=apellido_formulario,fechaInicio=fechaInicio_formulario,estado=estado_formulario,fechaInactividad=fechaInactividad_formulario)
+        empleado_id = Empleado.objects.latest('id')
+        boni = Bonificacion.objects.get_or_create(idEmpleado_id=empleado_id.id,BonificacionCuota=0.0,fechaBonificacion=fechaInicio_formulario)
+        reten = Retencion.objects.get_or_create(idEmpleado_id=empleado_id.id,RetencionCuota=0.0,fechaRetencion=fechaInicio_formulario)
+        #empleado_lista = Empleado.objects.all().order_by('-id')
+        #emp = Empleado.objects.all().order_by('-id')[:1][0]
         if request.method=="POST":
             return HttpResponseRedirect('/empleado/')
     return render(request,"post_empleado.html",{'form':form})
 
 #Funcion para Agregar Bonificacion
 def bonificacion_ingresar(request):
+    """
+    Funcion que permite insertar una nueva bonificacion a un empleado
+    en la base de datos, en caso de que haya una bonificacion en un mes y anio
+    para el mismo empleado este no se tomara en cuenta y no lo guardara en la
+    base de datos, pues solo se permite una bonificacion por mes y anio.
+    """
     empleados = Empleado.objects.all()
     form = BonificacionForm(request.POST or None, initial={'Bonificacion_form': 0.0})
     if form.is_valid():
@@ -54,6 +67,12 @@ def bonificacion_ingresar(request):
 
 #Funcion para Ingresar IGSS
 def igss_ingresar(request):
+    """
+    Funcion que permite insertar una nueva bonificacion a un empleado
+    en la base de datos, en caso de que haya una bonificacion en un mes y anio
+    para el mismo empleado este no se tomara en cuenta y no lo guardara en la
+    base de datos, pues solo se permite una bonificacion por mes y anio.
+    """
     form = IgssForm(request.POST or None)
     if form.is_valid():
         form_data = form.cleaned_data
@@ -86,6 +105,12 @@ def salario_ingresar(request):
 
 #Funcion para Ingresar Retenciones
 def retencion_ingresar(request):
+    """
+    Funcion que permite insertar una nueva retencion a un empleado
+    en la base de datos, en caso de que haya una retencion en un mes y anio
+    para el mismo empleado este no se tomara en cuenta y no lo guardara en la
+    base de datos, pues solo se permite una retencion por mes y anio.
+    """
     empleados = Empleado.objects.all()
     form = RetencionForm(request.POST or None, initial={'Retencion_form': 0.0})
     if form.is_valid():
@@ -203,14 +228,16 @@ def editar_planilla(request,id_planilla):
         planilla.cuota_salario_planilla= form_data.get("cuota_salario_planilla")
         planilla.bonificacion_planilla= form_data.get("bonificacion_planilla")
         planilla.retencion_planilla= form_data.get("retencion_planilla")
-        sueldoT = float(form_data.get("retencion_planilla"))
-        + float(form_data.get("cuota_salario_planilla"))
-        + float(form_data.get("bonificacion_planilla"))
+        sueldoT = float(form_data.get("retencion_planilla")) + float(form_data.get("cuota_salario_planilla"))+ float(form_data.get("bonificacion_planilla"))
+        print (form_data.get("retencion_planilla"))
+        print (sueldoT)
         planilla.sueldoTotal_planilla= sueldoT
-        sueldoL = sueldoT - float(form_data.get("retencion_planilla"))
-        - float(form_data.get("igss_cuota"))
+        sueldoL = sueldoT - float(form_data.get("retencion_planilla"))- float(form_data.get("igss_cuota"))
+        print (form_data.get("igss_cuota"))
         planilla.sueldoLiquido_planilla= sueldoL
         planilla.save()
+        if request.method=="POST":
+            return HttpResponseRedirect('/planilla_busqueda/')
     return render(request,"editar_planilla.html",{'form':form})
 
 #Funcion para Editar Empleado obteniendo id
@@ -285,32 +312,20 @@ def planilla_ver(request):
         anios.append(i)
     mes_seleccionado= request.POST.get('meses')
     anio_seleccionado= request.POST.get('nombres')
-    mes_planilla = mes_seleccionado
-    anio_planilla = anio_seleccionado
+    fecha_planilla = str(anio_seleccionado) + "-" + str(mes_seleccionado) + "-28"
     if request.method=="POST":
         anios_Igss = Igss.objects.get(anio=anio_seleccionado)
         anios_Salario = SalarioOrdinario.objects.get(anio=anio_seleccionado)
         empleados_anio = Empleado.objects.filter(fechaInicio__year__lte=anio_seleccionado,estado="Activo")
         for empleado in empleados_anio:
-            retencion_planilla = empleado.retencion_set.filter(
-            fechaRetencion__year__lte=anio_seleccionado,
-            fechaRetencion__month__lte=mes_seleccionado,
-            idEmpleado=empleado.id)[:1]
-            bonificacion_planilla = empleado.bonificacion_set.filter(
-            fechaBonificacion__year__lte=anio_seleccionado,
-            fechaBonificacion__month__lte=mes_seleccionado,
-            idEmpleado=empleado.id)[:1]
+            retencion_planilla = empleado.retencion_set.filter(fechaRetencion__lte=fecha_planilla,idEmpleado=empleado.id).order_by('-fechaRetencion')[:1]
+            bonificacion_planilla = empleado.bonificacion_set.filter(fechaBonificacion__lte=fecha_planilla,idEmpleado=empleado.id).order_by('-fechaBonificacion')[:1]
             for item in bonificacion_planilla:
                 empleado.bono = item.BonificacionCuota
-                if empleado.bono == "Unknown":
-                    empleado.bono = 0.0
-                    print (empleado.bono)
                 empleado.totalSueldo = float(anios_Salario.cuota_salario) + float(empleado.bono)
                 empleado.sueldoLiquido = empleado.totalSueldo - float(anios_Igss.cuota_igss)
             for items in retencion_planilla:
                 empleado.ret = items.RetencionCuota
-                if empleado.ret == "Unknown":
-                    empleado.ret = 0.0
                 empleado.totalSueldo += float(empleado.ret)
                 empleado.sueldoLiquido
 

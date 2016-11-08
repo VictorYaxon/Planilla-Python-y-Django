@@ -17,11 +17,11 @@ class EmpleadoForm(forms.Form):
 
 class BonificacionForm(forms.Form):
     Bonificacion_form = forms.FloatField(label = "Cuota Bonificacion")
-    fechaBonificacion_form = forms.DateField(label = "Fecha Bonificacion")
+    fechaBonificacion_form = forms.DateField(label = "Fecha Bonificacion",required=True)
 
 class RetencionForm(forms.Form):
     Retencion_form = forms.FloatField(label="Cuota Retencion")
-    fechaRetencion_form = forms.DateField(label = "Fecha Retencion")
+    fechaRetencion_form = forms.DateField(label = "Fecha Retencion",required=True)
 
 class PlanillaForm(forms.Form):
     pass
